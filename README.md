@@ -2,33 +2,33 @@
 
 **GSoC 2026 Prototype for DeepChem**
 
-## Overview
-Pure PyTorch implementation of symbolic regression using genetic programming.
+A pure PyTorch implementation of symbolic regression using genetic programming. Discovers mathematical equations from data automatically.
 
-## Goal
+## 🎯 Project Goal
+
 Replace Julia-based PySR with native PyTorch solution for DeepChem integration.
 
-## Current Status
-🚧 **Week 1 Prototype** - Core functionality implementation
+## ✨ Features
 
-### Implemented
-- [x] Expression tree representation
-- [x] Basic operators (add, mul, sin, cos, exp, log)
-- [ ] Genetic algorithm core
-- [ ] Fitness evaluation
-- [ ] Constant optimization
+- ✅ Expression tree representation with PyTorch evaluation
+- ✅ Genetic algorithm with tournament selection
+- ✅ Structure-preserving mutation operators
+- ✅ Automatic equation discovery from data
+- ✅ Fitness evaluation (MSE + complexity penalty)
+- ✅ Comprehensive test suite
+- ✅ Visualization of evolution progress
 
-### In Progress
-- [ ] Expression evaluation in PyTorch
-- [ ] Mutation operators
-- [ ] Crossover operators
+## 🚀 Quick Start
 
-### Planned
-- [ ] Neural-guided search (paper approach)
-- [ ] Benchmarking vs PySR
-- [ ] DeepChem TorchModel integration
-
-## Quick Start
 ```bash
+# Install dependencies
 pip install -r requirements.txt
+
+# Run basic test
 python src/expression.py
+
+# Run genetic algorithm test
+python src/genetic_algo.py
+
+# Run comprehensive test suite
+python tests/test_suite.py
