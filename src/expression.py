@@ -127,14 +127,20 @@ class ExpressionNode:
                 node_type=self.node_type,
                 operator=self.operator,
                 value=self.value,
+                left=None,
+                right=None,
             )
+        
+        # For operator nodes, copy children first
+        left_copy = self.left.copy() if self.left else None
+        right_copy = self.right.copy() if self.right else None
         
         return ExpressionNode(
             node_type=self.node_type,
             operator=self.operator,
             value=self.value,
-            left=self.left.copy() if self.left else None,
-            right=self.right.copy() if self.right else None,
+            left=left_copy,
+            right=right_copy,
         )
     
     def __str__(self) -> str:
