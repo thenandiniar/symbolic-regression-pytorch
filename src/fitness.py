@@ -3,8 +3,8 @@ Fitness function for symbolic regression.
 
 Fitness = MSE + complexity_penalty
 
-Author: Anand
-Date: March 2, 2025
+Author: Nandini A R
+Date: March 2, 2026
 GSoC 2026 - DeepChem Symbolic ML
 """
 
