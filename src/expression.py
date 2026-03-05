@@ -1,7 +1,7 @@
 """
 Expression tree representation for symbolic regression.
 
-Author: Anand
+Author: Nandini A R
 Date: March 2, 2025
 GSoC 2026 - DeepChem Symbolic ML
 """
