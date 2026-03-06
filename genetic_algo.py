@@ -9,10 +9,8 @@ GSoC 2026 - DeepChem Symbolic ML
 import torch
 import random
 from typing import List, Tuple, Optional
-from expression import (
-    ExpressionNode, ExpressionTree, NodeType, Operator,
-    make_variable, make_constant, make_operator
-)
+from expression import (ExpressionNode, ExpressionTree, NodeType, Operator,
+                        make_variable, make_constant, make_operator)
 from fitness import FitnessFunction
 
 
@@ -43,7 +41,10 @@ class SymbolicRegressor:
 
         if operators is None:
             self.operators = [
-                Operator.ADD, Operator.SUB, Operator.MUL, Operator.DIV,
+                Operator.ADD,
+                Operator.SUB,
+                Operator.MUL,
+                Operator.DIV,
             ]
         else:
             self.operators = operators
@@ -51,10 +52,13 @@ class SymbolicRegressor:
         self.binary_ops = [op for op in self.operators if op.arity == 2]
         self.unary_ops = [op for op in self.operators if op.arity == 1]
 
-    def generate_random_tree(self, max_depth: int, method: str = "grow") -> ExpressionNode:
+    def generate_random_tree(self,
+                             max_depth: int,
+                             method: str = "grow") -> ExpressionNode:
         if max_depth == 1 or (method == "grow" and random.random() < 0.3):
             if random.random() < 0.7:
-                return make_variable(feature_index=random.randint(0, self.n_features - 1))
+                return make_variable(
+                    feature_index=random.randint(0, self.n_features - 1))
             else:
                 return make_constant(random.uniform(-5, 5))
 
@@ -68,7 +72,8 @@ class SymbolicRegressor:
             child = self.generate_random_tree(max_depth - 1, method)
             return make_operator(op, child)
         else:
-            return make_variable(feature_index=random.randint(0, self.n_features - 1))
+            return make_variable(
+                feature_index=random.randint(0, self.n_features - 1))
 
     def initialize_population(self) -> List[ExpressionTree]:
         population = []
@@ -86,30 +91,33 @@ class SymbolicRegressor:
 
         return population
 
-    def tournament_selection(
-        self,
-        population: List[ExpressionTree],
-        fitnesses: List[float]
-    ) -> ExpressionTree:
-        tournament_indices = random.sample(range(len(population)), self.tournament_size)
+    def tournament_selection(self, population: List[ExpressionTree],
+                             fitnesses: List[float]) -> ExpressionTree:
+        tournament_indices = random.sample(range(len(population)),
+                                           self.tournament_size)
         tournament_fitnesses = [fitnesses[i] for i in tournament_indices]
-        winner_idx = tournament_indices[tournament_fitnesses.index(min(tournament_fitnesses))]
+        winner_idx = tournament_indices[tournament_fitnesses.index(
+            min(tournament_fitnesses))]
         return population[winner_idx]
 
     def mutate(self, node: ExpressionNode, depth: int = 0) -> ExpressionNode:
         if random.random() < 0.1:
-            return self.generate_random_tree(self.max_depth - depth, method="grow")
+            return self.generate_random_tree(self.max_depth - depth,
+                                             method="grow")
 
         if node.node_type == NodeType.CONSTANT:
             new_value = node.value + random.gauss(0, 0.5)
             return make_constant(new_value)
 
         elif node.node_type == NodeType.VARIABLE:
-            return make_variable(feature_index=random.randint(0, self.n_features - 1))
+            return make_variable(
+                feature_index=random.randint(0, self.n_features - 1))
 
         elif node.node_type == NodeType.OPERATOR:
-            left_mutated = self.mutate(node.left, depth + 1) if node.left else None
-            right_mutated = self.mutate(node.right, depth + 1) if node.right else None
+            left_mutated = self.mutate(node.left, depth +
+                                       1) if node.left else None
+            right_mutated = self.mutate(node.right, depth +
+                                        1) if node.right else None
 
             new_op = node.operator
             if random.random() < 0.2:
@@ -124,21 +132,17 @@ class SymbolicRegressor:
             return node.copy()
 
     def crossover(
-        self,
-        parent1: ExpressionNode,
-        parent2: ExpressionNode
-    ) -> Tuple[ExpressionNode, ExpressionNode]:
+            self, parent1: ExpressionNode,
+            parent2: ExpressionNode) -> Tuple[ExpressionNode, ExpressionNode]:
         child1 = parent1.copy()
         child2 = parent2.copy()
         return child1, child2
 
-    def evolve(
-        self,
-        x_train: torch.Tensor,
-        y_train: torch.Tensor,
-        generations: int = 50,
-        verbose: bool = True
-    ) -> Tuple[ExpressionTree, dict]:
+    def evolve(self,
+               x_train: torch.Tensor,
+               y_train: torch.Tensor,
+               generations: int = 50,
+               verbose: bool = True) -> Tuple[ExpressionTree, dict]:
         population = self.initialize_population()
         fitness_fn = FitnessFunction(x_train, y_train, self.complexity_weight)
 
@@ -180,7 +184,8 @@ class SymbolicRegressor:
                 parent2 = self.tournament_selection(population, fitnesses)
 
                 if random.random() < self.crossover_rate:
-                    child1_root, child2_root = self.crossover(parent1.root, parent2.root)
+                    child1_root, child2_root = self.crossover(
+                        parent1.root, parent2.root)
                 else:
                     child1_root = parent1.root.copy()
                     child2_root = parent2.root.copy()
@@ -202,7 +207,7 @@ class SymbolicRegressor:
 
         if verbose:
             print("-" * 60)
-            print(f"FINAL RESULT:")
+            print("FINAL RESULT:")
             print(f"Best fitness: {fitnesses[best_idx]:.6f}")
             print(f"Best expression: {best_tree}")
             print(f"Complexity: {best_tree.complexity()}")

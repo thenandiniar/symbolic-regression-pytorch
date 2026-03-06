@@ -3,13 +3,13 @@ import numpy as np
 import deepchem as dc
 from rdkit import Chem
 from rdkit.Chem import Descriptors
-from expression import Operator, ExpressionTree
-from fitness import FitnessFunction
+from expression import Operator
 from genetic_algo import SymbolicRegressor
 
 print("Loading Delaney dataset...")
 tasks, datasets, transformers = dc.molnet.load_delaney(featurizer='ECFP')
 train, valid, test = datasets
+
 
 def compute_descriptors(smiles_list):
     descriptors = []
@@ -26,6 +26,7 @@ def compute_descriptors(smiles_list):
         descriptors.append(desc)
     return np.array(descriptors)
 
+
 print("Computing molecular descriptors...")
 X_train = compute_descriptors(train.ids)
 y_train = train.y.flatten()
@@ -41,14 +42,12 @@ print("Running Symbolic Regression...")
 regressor = SymbolicRegressor(
     population_size=200,
     max_depth=3,
-    operators=[Operator.ADD, Operator.SUB, Operator.MUL, Operator.DIV]
-)
+    operators=[Operator.ADD, Operator.SUB, Operator.MUL, Operator.DIV])
 
-best_tree, history = regressor.evolve(
-    X_tensor, y_tensor,
-    generations=100,
-    verbose=True
-)
+best_tree, history = regressor.evolve(X_tensor,
+                                      y_tensor,
+                                      generations=100,
+                                      verbose=True)
 
 print()
 print("Best equation found:")
@@ -59,5 +58,5 @@ X_test_desc = compute_descriptors(test.ids)
 X_test_tensor = torch.tensor(X_test_desc, dtype=torch.float32)
 y_test = test.y.flatten()
 y_pred = best_tree.evaluate(X_test_tensor).detach().numpy()
-rmse = np.sqrt(np.mean((y_pred - y_test) ** 2))
+rmse = np.sqrt(np.mean((y_pred - y_test)**2))
 print(f"Test RMSE: {rmse:.3f}")
